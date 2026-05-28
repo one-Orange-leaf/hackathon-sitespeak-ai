@@ -1,0 +1,90 @@
+<ide_opened_file>The user opened the file /home/student/hackathon-sitespeak-ai/BUILDLOG.md in the IDE. This may or may not be related to the current task.</ide_opened_file>
+Create public/app.js for SiteSpeak AI. Node.js ESM is NOT used here — 
+this is a browser ES module (type="module" in the script tag).
+
+Architecture: single-state machine. One appState object, one setState() function 
+that sets body.dataset.state and updates the status bar.
+
+appState shape:
+{
+  worker: string | null,     // from URL ?worker= param
+  site: string | null,       // from URL ?site= param
+  photoFile: File | null,    // selected photo
+  photoDataUrl: string | null, // compressed base64
+  audioBlob: Blob | null,    // raw recorded audio
+  transcript: string | null, // whisper result
+  detectedLanguage: string,  // whisper detected_language, default 'en'
+  gpsCoords: { lat, lng } | null,
+  gpsState: 'pending' | 'granted' | 'denied' | 'unavailable'
+}
+
+On DOMContentLoaded:
+1. Parse URL params — set appState.worker and appState.site, 
+   display in #worker-info area (confirm-worker, confirm-site)
+2. Request GPS immediately — navigator.geolocation.getCurrentPosition 
+   with maximumAge: 60000, timeout: 10000. On success set gpsCoords and gpsState granted.
+   On error set gpsState denied/unavailable. Never block UI on GPS.
+3. Register service worker /sw.js if supported.
+
+Photo handling:
+- #photo-input and #photo-input-confirm both trigger same handler
+- On file select: compress using FileReader → Image → Canvas → toBlob 
+  at 800px max width, JPEG quality 0.7
+- Store File in appState.photoFile, base64 in appState.photoDataUrl
+- Show preview in #confirm-photo-preview, hide #confirm-photo-none
+- Update #photo-status to "Photo added ✓"
+
+Recording flow:
+- #record-btn toggles between idle→recording and recording→confirming
+- Use getSupportedMimeType() testing in order: 
+  'audio/webm;codecs=opus', 'audio/webm', 'audio/mp4;codecs=mp4a.40.2', 
+  'audio/mp4', 'audio/ogg;codecs=opus', 'audio/ogg', ''
+- MediaRecorder collects chunks into audioBlob
+- On stop: setState confirming, call enterConfirming()
+
+enterConfirming():
+1. Populate #confirm-worker and #confirm-site from appState
+2. Show/hide photo preview based on appState.photoFile
+3. Send audioBlob to /api/transcribe via FormData (field name: audio, 
+   include mimeType field with the recorder's mimeType)
+4. On transcribe success: populate #confirm-transcript, 
+   store detectedLanguage from response
+5. GPS gate: if gpsState is pending, wait up to 3 seconds polling every 500ms
+6. Populate #confirm-gps with address string or coordinate fallback
+7. If gpsCoords available and gmaps key present: set #confirm-map-img src to 
+   Google Static Maps URL (600x300, zoom 15, marker at coords)
+   Show #confirm-map-img, hide #confirm-map-unavailable
+
+Readback button (#readback-btn):
+- Uses window.speechSynthesis
+- Sets utterance.lang = appState.detectedLanguage
+- Reads appState.transcript aloud
+
+Submit flow (#submit-btn):
+- Compress photo to base64 if present (already done, use appState.photoDataUrl)
+- POST to /api/analyze with JSON body: 
+  { transcript, photoBase64, mimeType, worker, site, lat, lng }
+- setState processing during fetch
+- On success: populate result panel fields, setState result
+- On error: setState error, populate #error-message
+
+Result panel:
+- #result-title, #result-category, #result-priority, #result-summary 
+  from response.task fields
+- #result-meta-row: worker, site, coordinates, webhook_ok status
+- #result-transcript: show response.transcript (the worker's original words)
+- #usage-counter: update with response.meta.requests_used + '/50'
+
+Restart buttons (#restart-btn, #error-restart-btn):
+- RESTART_COOLDOWN_MS = 2000 — disable button for 2 seconds after click
+- clearAppState() resets photoFile, photoDataUrl, audioBlob, transcript, 
+  detectedLanguage. Does NOT reset worker or site.
+- setState idle
+
+Error handling: all fetch calls wrapped in try/catch, 
+errors route to error panel with descriptive message.
+
+
+create a markdown file to review the code - do not change anything in our repo
+
+review and validate
