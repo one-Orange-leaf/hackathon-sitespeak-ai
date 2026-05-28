@@ -1,0 +1,47 @@
+<ide_opened_file>The user opened the file /home/student/hackathon-sitespeak-ai/BUILDLOG.md in the IDE. This may or may not be related to the current task.</ide_opened_file>
+Create api/transcribe.js — a Vercel serverless function for audio transcription.
+
+CRITICAL: Use Node.js Express-style signature (req, res) — NOT Web fetch style.
+Export config to disable bodyParser (required for raw binary audio):
+  export const config = { api: { bodyParser: false } }
+
+The function receives a multipart/form-data POST with:
+- field "audio": raw audio binary
+- field "mimeType": MIME type string (may include codec suffix e.g. "audio/mp4;codecs=mp4a.40.2")
+
+Steps:
+1. Parse the multipart body manually using a helper that reads req into a Buffer, 
+   then splits on the boundary from Content-Type header to extract the audio binary 
+   and mimeType string fields.
+
+2. Strip codec suffix from mimeType before extension lookup:
+   const baseType = mimeType.split(';')[0].trim()
+
+3. MIME_TO_EXT map (8 entries):
+   'audio/webm': 'webm'
+   'audio/webm;codecs=opus': 'webm'
+   'audio/mp4': 'mp4'
+   'audio/mp4;codecs=mp4a.40.2': 'mp4'
+   'audio/ogg': 'ogg'
+   'audio/ogg;codecs=opus': 'ogg'
+   'audio/mpeg': 'mp3'
+   'audio/wav': 'wav'
+   Default fallback: 'webm'
+
+4. Call OpenAI Whisper via native fetch (no npm dependency):
+   POST https://api.openai.com/v1/audio/transcriptions
+   Authorization: Bearer process.env.OPENAI_API_KEY
+   Body: FormData with file (Blob with correct type + filename), 
+   model: whisper-1, response_format: verbose_json
+
+5. Return: res.status(200).json({ 
+     transcript: data.text, 
+     detected_language: data.language 
+   })
+
+6. Catch block: res.status(500).json({ error: 'Transcription failed.' })
+
+Use Node.js built-in FormData and fetch (Node 20 has both natively).
+No OpenAI npm package — native fetch only.
+
+Review and validate
