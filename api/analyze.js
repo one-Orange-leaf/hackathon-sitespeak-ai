@@ -80,6 +80,11 @@ export default async function handler(req, res) {
     }
     if (sanitisedTranscript) content.push({ type: 'text', text: sanitisedTranscript })
 
+    if (content.length === 0) {
+      res.status(400).json({ error: 'No content to analyze. Please record audio or attach a photo.' })
+      return
+    }
+
     const response = await client.messages.create({
       model:       'claude-haiku-4-5',
       max_tokens:  1024,
