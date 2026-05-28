@@ -27,3 +27,27 @@ designer owns style.css exclusively and never touches app logic.
 
 ---
 
+## Step 3 — Stylesheet
+<<<<<<< HEAD
+**Time:** [fill in]
+=======
+**Time:** 12:20pm
+>>>>>>> 4daf9ed9724c7ab9bb2e3bc0efad767f443adb60
+**Files:** public/style.css
+**Commit:** feat: mobile-first stylesheet with state machine visibility
+**Why:** All show/hide logic lives in CSS via body[data-state] (idle, recording, transcribing, confirming, sending, done, error) selectors. 
+JS only changes one attribute — CSS does all the visibility work. 
+Designer can restyle freely without touching app logic.
+
+---
+
+## Step 4 — App Logic
+**Time:** 12:40pm
+**Files:** public/app.js
+**Commit:** feat: app state machine, media recorder, GPS, photo compression
+**Why:** Core brain of the frontend. State machine drives all UI transitions. 
+GPS requested on load only — never mid-flow. Photo compressed before transmission 
+to keep API costs low (~1600 tokens vs 6000+ uncompressed).
+
+---
+
