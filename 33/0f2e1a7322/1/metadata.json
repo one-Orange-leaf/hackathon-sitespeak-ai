@@ -1,0 +1,61 @@
+{
+  "cli_version": "0.6.3",
+  "checkpoint_id": "330f2e1a7322",
+  "session_id": "cad6977d-9fb5-458b-a430-6cd9c1a54f83",
+  "strategy": "manual-commit",
+  "created_at": "2026-05-28T15:01:01.531478596Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "api/transcribe.js",
+    "public/app.js",
+    "vercel.json"
+  ],
+  "agent": "Claude Code",
+  "model": "",
+  "turn_id": "530e0c162771",
+  "token_usage": {
+    "input_tokens": 10,
+    "cache_creation_tokens": 34436,
+    "cache_read_tokens": 218131,
+    "output_tokens": 5790,
+    "api_call_count": 6
+  },
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-05-28T15:01:01.522845049Z",
+    "agent_lines": 17,
+    "agent_removed": 63,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 1,
+    "total_committed": 17,
+    "total_lines_changed": 81,
+    "agent_percentage": 98.76543209876543,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 1,
+      "user_lines_removed": 1,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "vercel.json": 1
+      },
+      "user_removed_per_file": {
+        "vercel.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 19,
+      "agent_lines_removed": 64
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+<ide_opened_file>The user opened the file /home/student/hackathon-sitespeak-ai/api/transcribe.js in the IDE. This may or may not be related to the current task.</ide_opened_file>
+Confirmed: plain Vercel functions, no Next.js. The export const config is doing nothing here — it's a Next.js-only convention.
+
+The real fix: rewrite transcribe.js to stop expecting multipart entirely. Send the audio as raw binary from app.js instead. This is simpler, more reliable, and what CLAUDE.md actually specifies.
+
+Two changes needed:
+
+1. app.js — send raw blob, not FormData:
+
+Replace the fetch block (lines 337–343) with:
+js
+
+appState._abortController = new AbortController()
+const res = await fetchWithRetry('/api/transcribe', {
+  method: 'POST',
+  headers: { 'Content-Type': appState.audioMimeType },
+  body: appState.audioBlob,
+  signal: appState._abortController.signal
+})
+
+2. api/transcribe.js — rewrite to receive raw binary:
+
+Replace the entire handler's body-reading + parsing section with:
+js
+
+const contentType = req.headers['content-type'] || 'audio/webm'
+const baseType    = contentType.split(';')[0].trim()
+const ext         = MIME_TO_EXT[baseType] || 'webm'
+const buf         = await readBody(req)
+const audioBuffer = buf
+
+const form = new FormData()
+form.append('file', new Blob([audioBuffer], { type: baseType }), `recording.${ext}`)
+form.append('model', 'whisper-1')
+form.append('response_format', 'verbose_json')
+
+Remove the parseMultipart call and the boundaryMatch check entirely — they're no longer needed.
+
+Do this in Claude Code, commit, push. This eliminates the multipart layer completely.
