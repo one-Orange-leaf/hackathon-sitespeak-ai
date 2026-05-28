@@ -1,0 +1,11 @@
+<ide_opened_file>The user opened the file /home/student/hackathon-sitespeak-ai/ARCHITECTURE.md in the IDE. This may or may not be related to the current task.</ide_opened_file>
+Create a .gitignore for a Node.js project deployed on Vercel. 
+Exclude node_modules, .env files, .vercel folder, and OS files like .DS_Store.
+
+Also create a package.json for a project called sitespeak-ai. 
+It uses Node.js ESM (type: module), has one dependency: @anthropic-ai/sdk at ^0.39.0, 
+and no build step.
+
+Finally create vercel.json that configures two serverless functions:
+- api/analyze.js with maxDuration 45 and nodejs20.x runtime
+- api/transcribe.js with maxDuration 30 and nodejs20.x runtime

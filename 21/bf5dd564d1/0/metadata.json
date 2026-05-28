@@ -1,0 +1,60 @@
+{
+  "cli_version": "0.6.3",
+  "checkpoint_id": "21bf5dd564d1",
+  "session_id": "c65ea6f0-1299-4b9b-90dc-77d9d2bd9ecb",
+  "strategy": "manual-commit",
+  "created_at": "2026-05-28T08:46:02.109707166Z",
+  "branch": "scaffold",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".gitignore",
+    "package.json",
+    "vercel.json"
+  ],
+  "agent": "Claude Code",
+  "model": "",
+  "turn_id": "65790cb6b551",
+  "checkpoint_transcript_start": 33,
+  "transcript_lines_at_start": 33,
+  "token_usage": {
+    "input_tokens": 11,
+    "cache_creation_tokens": 46523,
+    "cache_read_tokens": 198911,
+    "output_tokens": 1298,
+    "api_call_count": 7
+  },
+  "session_metrics": {
+    "turn_count": 2
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-05-28T08:46:02.105087771Z",
+    "agent_lines": 40,
+    "agent_removed": 0,
+    "human_added": 17,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 57,
+    "total_lines_changed": 57,
+    "agent_percentage": 70.17543859649122,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 17,
+      "user_lines_removed": 0,
+      "agent_lines_added": 40,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "BUILDLOG.md": 17
+      }
+    }
+  ]
+}
