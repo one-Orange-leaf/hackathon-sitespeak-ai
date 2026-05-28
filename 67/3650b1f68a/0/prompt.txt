@@ -45,3 +45,8 @@ Use Node.js built-in FormData and fetch (Node 20 has both natively).
 No OpenAI npm package — native fetch only.
 
 Review and validate
+
+---
+
+<ide_opened_file>The user opened the file /home/student/hackathon-sitespeak-ai/api/transcribe.js in the IDE. This may or may not be related to the current task.</ide_opened_file>
+stage and push on a new branch for api structure - commit "feat: whisper transcription endpoint with multipart parsing"
