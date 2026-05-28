@@ -455,7 +455,7 @@ async function handleSubmit() {
   try {
     const res  = await fetchWithRetry('/api/analyze', {
       method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body:    JSON.stringify(body),
       signal:  appState._abortController.signal
     })
