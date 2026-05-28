@@ -1,0 +1,28 @@
+<ide_opened_file>The user opened the file /home/student/hackathon-sitespeak-ai/BUILDLOG.md in the IDE. This may or may not be related to the current task.</ide_opened_file>
+On branch scaffold - Create two PWA files for SiteSpeak AI:
+
+1. public/sw.js — service worker:
+   CACHE name: 'sitespeak-v1'
+   SHELL array: '/', '/index.html', '/style.css', '/app.js', '/motion.js', 
+                '/manifest.json', '/icon-192.png', '/icon-512.png'
+   
+   install event: cache all SHELL files, skipWaiting
+   activate event: delete all caches not matching current CACHE name, clients.claim
+   fetch event: 
+     - if URL includes '/api/': network only, on fail return 503 JSON {error: 'Offline'}
+     - otherwise: cache first, fall back to network
+
+2. public/manifest.json:
+   name: "SiteSpeak AI"
+   short_name: "SiteSpeak"
+   description: "Construction site voice note logger"
+   start_url: "/"
+   display: "standalone"
+   background_color: "#111111"
+   theme_color: "#111111"
+   icons: 192x192 and 512x512 PNG at /icon-192.png and /icon-512.png
+
+---
+
+<ide_opened_file>The user opened the file /home/student/hackathon-sitespeak-ai/BUILDLOG.md in the IDE. This may or may not be related to the current task.</ide_opened_file>
+stage and push on branch scaffold - commit: "feat: service worker and PWA manifest"

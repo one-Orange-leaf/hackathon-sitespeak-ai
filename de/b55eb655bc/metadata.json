@@ -1,0 +1,26 @@
+{
+  "cli_version": "0.6.3",
+  "checkpoint_id": "deb55eb655bc",
+  "strategy": "manual-commit",
+  "branch": "api-structure",
+  "checkpoints_count": 2,
+  "files_touched": [
+    "public/manifest.json",
+    "public/sw.js"
+  ],
+  "sessions": [
+    {
+      "metadata": "/de/b55eb655bc/0/metadata.json",
+      "transcript": "/de/b55eb655bc/0/full.jsonl",
+      "content_hash": "/de/b55eb655bc/0/content_hash.txt",
+      "prompt": "/de/b55eb655bc/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 13,
+    "cache_creation_tokens": 21656,
+    "cache_read_tokens": 209690,
+    "output_tokens": 1433,
+    "api_call_count": 7
+  }
+}
