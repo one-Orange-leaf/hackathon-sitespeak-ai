@@ -28,7 +28,11 @@ designer owns style.css exclusively and never touches app logic.
 ---
 
 ## Step 3 — Stylesheet
+<<<<<<< HEAD
 **Time:** [fill in]
+=======
+**Time:** 12:20pm
+>>>>>>> 4daf9ed9724c7ab9bb2e3bc0efad767f443adb60
 **Files:** public/style.css
 **Commit:** feat: mobile-first stylesheet with state machine visibility
 **Why:** All show/hide logic lives in CSS via body[data-state] (idle, recording, transcribing, confirming, sending, done, error) selectors. 
