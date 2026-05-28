@@ -1,0 +1,9 @@
+{
+  "name": "sitespeak-ai",
+  "version": "1.0.0",
+  "description": "Mobile-first voice note app for construction site workers",
+  "type": "module",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0"
+  }
+}
