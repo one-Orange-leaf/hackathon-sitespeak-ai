@@ -1,0 +1,37 @@
+Got it. Root cause is clear.
+
+The error:
+
+[analyze] 400 {"type":"error","error":{"type":"invalid_request_error","message":"messages: text content bl...
+
+This is the Anthropic API rejecting the request. The truncated message is almost certainly:
+
+    "messages: text content blocks must have non-empty text"
+
+That means an empty string "" is being passed as a text content block in the messages array. This happens on the photo-only path — when transcript is empty and the multimodal message is constructed with { type: 'text', text: '' }.
+
+Claude's API rejects empty text blocks. Your system prompt says photo-only is valid, but the SDK enforces non-empty text content at the API level.
+
+Fix — in api/analyze.js, where you build the multimodal message:
+
+When transcript is empty and an image is present, either omit the text block entirely, or substitute a minimal non-empty placeholder.
+js
+
+// Current (broken):
+{ role: 'user', content: [
+  { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 }},
+  { type: 'text', text: transcriptText }  // empty string → 400
+]}
+
+// Fixed:
+const contentBlocks = [
+  { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 }}
+]
+if (transcriptText) {
+  contentBlocks.push({ type: 'text', text: transcriptText })
+}
+{ role: 'user', content: contentBlocks }
+
+For the voice-only path (no image), the fix is the same logic in reverse — only include the image block if base64 is present.
+
+Hand to Claude Code now with this exact diagnosis. The transcribe calls at 18:06:19 and 18:07:15 are succeeding (200), so Whisper is fine — the failure is 100% in the message construction in analyze.js.
