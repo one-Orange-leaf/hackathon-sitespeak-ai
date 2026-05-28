@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/analyze.js":    { "maxDuration": 45 },
-    "api/transcribe.js": { "maxDuration": 30 }
+    "api/analyze.js":    { "maxDuration": 45, "runtime": "nodejs20.x" },
+    "api/transcribe.js": { "maxDuration": 30, "runtime": "nodejs20.x" }
   }
 }
