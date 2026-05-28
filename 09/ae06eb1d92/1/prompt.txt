@@ -1,0 +1,20 @@
+<ide_opened_file>The user opened the file /home/student/hackathon-sitespeak-ai/api/transcribe.js in the IDE. This may or may not be related to the current task.</ide_opened_file>
+stage and push
+
+---
+
+There it is. appState.transcript = null on line 555 (in clearAppState).
+handleSubmit checks !appState.transcript — null is falsy, so it falls through to showError. But wait, that would show the client-side error, not hit the server at all.
+The server is getting hit and returning 400. So transcript is reaching the server as an empty string or null. The issue is appState.transcript || '' sends '' when transcript is null, and sanitise('') returns '' which is falsy, so content stays empty → 400.
+Root cause: handleSubmit guard on line 433 checks !appState.transcript but appState.transcript can be '' (empty string from photo-only or transcription failure path) which is also falsy — so the guard should catch it. But it's not catching it, which means appState.photoDataUrl is also null/falsy, and yet the request still reaches the server.
+Wait — re-read line 433: the check passes to showError if both are falsy. But we're seeing 400s from the server, meaning the request IS being sent. That means either appState.photoDataUrl is set (truthy) but photoBase64 ends up null on the server, OR the guard isn't running.
+Most likely scenario: User attaches a photo (sets photoDataUrl), but the photo processing fails silently, sending a null photoBase64 to the server with an empty transcript.
+Check: does photoDataUrl include the data:image/jpeg;base64, prefix? Line 443: appState.photoDataUrl.split(',')[1] — if photoDataUrl is malformed or the split fails, photoBase64 becomes undefined, which analyze.js treats as no image.
+The fix needed in analyze.js: The cleanBase64 check should also validate that the string has actual content, not just existence. But more importantly, the client guard needs to be tightened.
+Immediate fix for the demo — in handleSubmit in app.js, change line 433 from:
+jsif (!appState.transcript && !appState.photoDataUrl) {
+to:
+jsconst hasTranscript = appState.transcript && appState.transcript.trim().length > 0
+const hasPhoto = appState.photoDataUrl && appState.photoDataUrl.includes(',')
+if (!hasTranscript && !hasPhoto) {
+This catches the case where photoDataUrl is set but malformed. Do this in Claude Code now — it's a one-line guard change in app.js around line 433.
