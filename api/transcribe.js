@@ -1,14 +1,12 @@
-export const config = { api: { bodyParser: false } }
-
 const MIME_TO_EXT = {
-  'audio/webm':                   'webm',
-  'audio/webm;codecs=opus':       'webm',
-  'audio/mp4':                    'mp4',
-  'audio/mp4;codecs=mp4a.40.2':   'mp4',
-  'audio/ogg':                    'ogg',
-  'audio/ogg;codecs=opus':        'ogg',
-  'audio/mpeg':                   'mp3',
-  'audio/wav':                    'wav',
+  'audio/webm':                 'webm',
+  'audio/webm;codecs=opus':     'webm',
+  'audio/mp4':                  'mp4',
+  'audio/mp4;codecs=mp4a.40.2': 'mp4',
+  'audio/ogg':                  'ogg',
+  'audio/ogg;codecs=opus':      'ogg',
+  'audio/mpeg':                 'mp3',
+  'audio/wav':                  'wav',
 }
 
 function setCors(res) {
@@ -24,41 +22,6 @@ function readBody(req) {
     req.on('end', () => resolve(Buffer.concat(chunks)))
     req.on('error', reject)
   })
-}
-
-function parseMultipart(buf, boundary) {
-  const CRLFCRLF   = Buffer.from('\r\n\r\n')
-  const bBuf       = Buffer.from('--' + boundary)
-  const partSep    = Buffer.from('\r\n--' + boundary)
-  const fields     = {}
-
-  let pos = buf.indexOf(bBuf)
-  if (pos === -1) return fields
-  pos += bBuf.length
-
-  while (pos < buf.length) {
-    // Closing boundary ends with '--'
-    if (buf[pos] === 0x2D && buf[pos + 1] === 0x2D) break
-    // Each part boundary is followed by \r\n
-    if (buf[pos] === 0x0D && buf[pos + 1] === 0x0A) pos += 2
-    else break
-
-    const hEnd = buf.indexOf(CRLFCRLF, pos)
-    if (hEnd === -1) break
-
-    const headers    = buf.slice(pos, hEnd).toString()
-    const bodyStart  = hEnd + 4
-    const nextBound  = buf.indexOf(partSep, bodyStart)
-    if (nextBound === -1) break
-
-    const body = buf.slice(bodyStart, nextBound)
-    const m    = headers.match(/name="([^"]+)"/i)
-    if (m) fields[m[1]] = body
-
-    pos = nextBound + partSep.length
-  }
-
-  return fields
 }
 
 export default async function handler(req, res) {
@@ -81,20 +44,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    const contentType    = req.headers['content-type'] || ''
-    const boundaryMatch  = contentType.match(/boundary=([^\s;]+)/)
-    if (!boundaryMatch) {
-      res.status(400).json({ error: 'Missing multipart boundary.' })
-      return
-    }
+    const contentType = req.headers['content-type'] || 'audio/webm'
+    const baseType    = contentType.split(';')[0].trim()
+    const ext         = MIME_TO_EXT[baseType] || 'webm'
 
-    const buf    = await readBody(req)
-    const fields = parseMultipart(buf, boundaryMatch[1])
-
-    const audioBuffer  = fields['audio']
-    const mimeTypeRaw  = fields['mimeType']?.toString().trim() || 'audio/webm'
-    const baseType     = mimeTypeRaw.split(';')[0].trim()
-    const ext          = MIME_TO_EXT[baseType] || 'webm'
+    const audioBuffer = await readBody(req)
 
     const form = new FormData()
     form.append('file', new Blob([audioBuffer], { type: baseType }), `recording.${ext}`)

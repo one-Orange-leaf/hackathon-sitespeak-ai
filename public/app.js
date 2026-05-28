@@ -334,12 +334,13 @@ async function enterConfirming() {
 
   try {
     if (appState.audioBlob?.size > 0) {
-      const formData = new FormData()
-      formData.append('audio',    appState.audioBlob)
-      formData.append('mimeType', appState.audioMimeType)
-
       appState._abortController = new AbortController()
-      const res  = await fetchWithRetry('/api/transcribe', { method: 'POST', body: formData, signal: appState._abortController.signal })
+      const res = await fetchWithRetry('/api/transcribe', {
+        method:  'POST',
+        headers: { 'Content-Type': appState.audioMimeType || 'audio/webm' },
+        body:    appState.audioBlob,
+        signal:  appState._abortController.signal
+      })
       const data = await res.json()
 
       appState.transcript       = sanitise(data.transcript || '')
