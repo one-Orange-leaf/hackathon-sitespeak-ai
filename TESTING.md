@@ -30,7 +30,7 @@ Do not mark the build complete until the integration gate passes in full.
 ### Scaffold Gate (Step 1)
 - [x] `package.json` has `"type": "module"` and exactly one dependency: `@anthropic-ai/sdk`
 - [x] `vercel.json` sets `maxDuration: 45` for `analyze.js` and `maxDuration: 30` for `transcribe.js`
-- [x] `vercel.json` sets runtime to `nodejs20.x` for both functions
+- [x] Node 20 runtime declared via `package.json` `"engines": { "node": "20.x" }` — the `runtime` field in `vercel.json` is intentionally absent (invalid on current Vercel API; see git: "fix: remove invalid runtime field from vercel.json again")
 - [x] `.gitignore` contains `.env.local` as first entry
 - [ ] `npm install` runs without errors
 - [ ] No other files exist yet
@@ -86,8 +86,9 @@ Do not mark the build complete until the integration gate passes in full.
 - [x] `initGeolocation()` runs second — GPS requested on load, never mid-flow
 - [x] `setState('idle')` runs third — record button active after GPS init
 - [x] `appState.gpsState` initialises to `'pending'`
-- [x] `clearAppState()` does NOT reset `lat`, `lng`, `gpsState`, `locationLabel`, `worker_id`, `site_id`
-- [x] `clearAppState()` DOES reset `mediaRecorder`, `audioChunks`, `audioMimeType`, `detectedLanguage`, `_recordingTimer`
+- [x] `clearAppState()` does NOT reset GPS or identity state
+  > **Field name divergence:** CLAUDE.md uses `lat`, `lng`, `worker_id`, `site_id` but actual fields are `appState.gpsCoords` (object), `appState.worker`, `appState.site`. Behaviour is correct.
+- [x] `clearAppState()` DOES reset `mediaRecorder`, `audioChunks`, `audioMimeType`, `detectedLanguage`, `_recordingTimer`, `photoFile`, `photoDataUrl`, `audioBlob`
 - [x] `clearAppState()` disables restart button for `RESTART_COOLDOWN_MS = 2000`
 - [x] `getSupportedMimeType()` tests in order: `webm;codecs=opus` → `webm` → `ogg;codecs=opus` → `ogg` → `mp4`
 - [x] No `window.SpeechRecognition` or `window.webkitSpeechRecognition` anywhere in code
@@ -161,7 +162,7 @@ Do not mark the build complete until the integration gate passes in full.
 ### PWA Gate (Step 8)
 - [x] `manifest.json` has `name`, `short_name`, `icons`, `background_color`, `display: 'standalone'`
 - [x] Service worker registered in `app.js` with `navigator.serviceWorker.register('/sw.js')`
-- [x] Cache version string is named (e.g. `sitespeak-v3`) — easy to increment on deploy
+- [x] Cache version string is named (e.g. `sitespeak-v4`) — easy to increment on deploy
 - [x] App shell files cached: `index.html`, `style.css`, `app.js`, `motion.js`, `manifest.json`
 - [x] API routes (`/api/*`) always go to network — never cached
 - [x] Stale cache served on network failure for app shell (offline graceful degradation)
@@ -224,6 +225,25 @@ Run before the demo slot. These are the failure modes most likely to appear unde
 | Large photo | Attach a 10MB photo | Client-side rejects it, shows error message |
 | Repeat submissions | Submit 5 times rapidly with 2s gaps | All 5 cards appear in Trello, counter increments correctly |
 | Old service worker | Deploy a change without incrementing cache version | Old app served — confirms why version increment is mandatory |
+
+---
+
+## Known Doc-to-Code Divergences (Verified, Not Bugs)
+
+These are places where CLAUDE.md spec language differs from the actual implementation. The implementation is correct; the spec language is aspirational or pre-dates a refactor.
+
+| Area | CLAUDE.md spec | Actual implementation | Impact |
+|---|---|---|---|
+| `appState` GPS fields | `appState.lat`, `appState.lng` (flat) | `appState.gpsCoords = { lat, lng }` | None — request body still sends flat `lat`/`lng` |
+| `appState` identity fields | `appState.worker_id`, `appState.site_id` | `appState.worker`, `appState.site` | None — request body uses `worker_id`/`site_id` keys correctly |
+| `appState` photo field | `appState.photoBase64` | `appState.photoDataUrl` (full data URL; base64 extracted on send) | None |
+| `analyze.js` response | includes `detected_language` | not returned (client has it from `/api/transcribe`) | None — `appState.detectedLanguage` populated at transcribe step |
+| `transcribe.js` body parsing | `bodyParser: false` config | manual `readBody()` function; no explicit config | In practice safe — audio MIME types bypass Vercel's JSON parser |
+| `vercel.json` runtime | `"runtime": "nodejs20.x"` in both functions | no `runtime` field; Node 20 via `package.json engines` | None — Vercel reads engines correctly |
+| Static Maps zoom | `zoom=16` | `zoom=15` | Visual only |
+| Static Maps size | `size=400x180` | `size=600x300` | Visual only |
+| Anthropic client | module-level `const client = new Anthropic()` | instantiated inside handler per request | Minor perf — no correctness impact |
+| `gpsState` values (comment) | — | code comment said `'granted'/'denied'/'unavailable'`; now corrected to `'pending'/'resolved'/'failed'` | Fixed |
 
 ---
 

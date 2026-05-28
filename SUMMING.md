@@ -43,7 +43,7 @@ None.
 | MAKE_WEBHOOK_URL | ✅ Set | Production + Preview |
 | GOOGLE_MAPS_KEY | ✅ In HTML | Referrer-restricted to sitespeak-ai.vercel.app/* + localhost |
 | MAX_REQUESTS | ✅ 50 | Counter low after preflight reset |
-| Service Worker | ✅ sitespeak-v3 | Cache clean on Android Chrome |
+| Service Worker | ✅ sitespeak-v4 | Cache clean on Android Chrome |
 | Branch | main | All changes deployed |
 | Production URL | ✅ Live | https://sitespeak-ai.vercel.app/ |
 | Make.com | ✅ Active | Webhook → Trello → ImgBB filter → Trello Attachment |

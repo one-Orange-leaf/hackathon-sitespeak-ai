@@ -36,6 +36,18 @@ JS only changes one attribute — CSS does all the visibility work.
 Designer can restyle freely without touching app logic.
 ---
 
+## Step 4 — Frontend Logic
+**Time:** 12:45pm
+**Files:** public/app.js
+**Commit:** feat: app state machine, recording, transcription fetch, confirm panel, result card
+**Why:** Single-file frontend brain. State machine driven by `document.body.dataset.state`
+attribute — CSS handles all show/hide, JS never touches classList for visibility.
+GPS requested on page load (never mid-flow). MediaRecorder with MIME type negotiation
+covers Chrome/Firefox/Safari without any browser-detection branching. compressImage()
+uses FileReader → Image → Canvas → toBlob for iOS 14 compat (createImageBitmap absent).
+
+---
+
 ## Step 5 — Transcription Endpoint
 **Time:** 13:00
 **Files:** api/transcribe.js
@@ -75,6 +87,36 @@ never throws. Optional layer — app works fully without it.
 **Why:** Service worker enables offline error handling on API routes and 
 installable PWA on Android Chrome. Cache versioned — increment on every 
 deploy to force fresh files to installed clients.
+
+---
+
+## Post-Build — Bug Fixes and Hardening (24 May 2026)
+**Files:** api/analyze.js, api/transcribe.js, public/app.js
+**Commits:** multiple fix: commits (see git log)
+
+Key fixes applied before the hackathon demo window:
+
+| Fix | Root Cause | File |
+|---|---|---|
+| Coordinates showing as `3823.756` in Trello | Make.com joining lat/lng with no separator | Make.com scenario |
+| Counter counting down (49/50) | Displaying `remaining` instead of `count` | app.js |
+| Discard during send corrupted state | No AbortController on in-flight fetch | app.js |
+| Tab switch during recording reset all state | `visibilitychange` was unconditional reset | app.js |
+| Readback auto-playing on iOS Safari | `speechSynthesis.speak()` outside user gesture | app.js |
+| `[WORKER INPUT]` block invisible on Android | CSS specificity conflict with inline style | style.css |
+| ImgBB error on no-photo submissions | Make.com ran ImgBB step when `image` was null | Make.com scenario |
+| GPS null on short recordings | GPS still `pending` when confirm panel opened | app.js |
+| analyze.js body parsing | Vercel auto-parsed body before raw read | api/analyze.js |
+| transcribe.js body parsing | Body read pattern mismatch | api/transcribe.js |
+
+---
+
+## Documentation Overhaul (24 May 2026)
+**Files:** ARCHITECTURE.md, DEMO.md, CLAUDE.md, SUMMING.md, README.md, BUILDLOG.md
+**Why:** Pre-demo documentation pass — added D11 (language detection drives readback),
+D12 (Phase A/B architecture split), D13 (judge personalisation via QR codes) to
+ARCHITECTURE.md. DEMO.md updated with full judge QR code table and Mandarin scenario.
+Service worker bumped to `sitespeak-v4`.
 
 ---
 

@@ -39,7 +39,7 @@ const appState = {
 
   // GPS (never reset)
   gpsCoords:     null,
-  gpsState:      'pending',   // 'pending' | 'granted' | 'denied' | 'unavailable'
+  gpsState:      'pending',   // 'pending' | 'resolved' | 'failed'
   locationLabel: null,
 
   // Per-submission (reset on clearAppState)

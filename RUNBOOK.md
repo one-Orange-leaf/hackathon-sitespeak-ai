@@ -151,7 +151,7 @@ For each symptom: cause → fix → what to tell the judge.
 | **Fix A** | DevTools → Application → Service Workers → "Update on reload" → refresh |
 | **Fix B** | Chrome: Settings → Clear browsing data → Cached images and files → reload |
 | **Fix C** | Incognito window — bypasses service worker cache entirely |
-| **Root cause** | Service worker version string (`sitespeak-v3`) was not incremented on last deploy |
+| **Root cause** | Service worker version string was not incremented on last deploy |
 | **Judge line** | [none needed — fix silently, don't mention it] |
 
 ---
@@ -213,8 +213,7 @@ Use only if the production build is broken and a fix is needed mid-hackathon.
 # 1. Make the fix in your editor
 
 # 2. Increment service worker version string — DO THIS BEFORE git add
-# In public/sw.js, change: const CACHE_NAME = 'sitespeak-v3'
-# To:                       const CACHE_NAME = 'sitespeak-v4'
+# In public/sw.js, increment: const CACHE = 'sitespeak-vN'  (currently sitespeak-v4)
 # (increment on every deploy — without this, phones serve the old cached build)
 
 # 3. Commit and push
