@@ -441,21 +441,20 @@ async function handleSubmit() {
   appState._abortController = new AbortController()
 
   const body = {
-    transcript:        appState.transcript || '',
-    photoBase64:       appState.photoDataUrl ? appState.photoDataUrl.split(',')[1] : null,
-    mimeType:          'image/jpeg',
-    worker:            appState.worker,
-    site:              appState.site,
-    lat:               appState.gpsCoords?.lat ?? null,
-    lng:               appState.gpsCoords?.lng ?? null,
-    locationLabel:     appState.locationLabel || null,
-    detectedLanguage:  appState.detectedLanguage || 'en'
+    text:          appState.transcript || '',
+    image:         appState.photoDataUrl ? appState.photoDataUrl.split(',')[1] : null,
+    lat:           appState.gpsCoords?.lat ?? null,
+    lng:           appState.gpsCoords?.lng ?? null,
+    timestamp:     new Date().toISOString(),
+    locationLabel: appState.locationLabel || null,
+    worker_id:     appState.worker,
+    site_id:       appState.site
   }
 
   try {
     const res  = await fetchWithRetry('/api/analyze', {
       method:  'POST',
-      headers: { 'Content-Type': 'text/plain' },
+      headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(body),
       signal:  appState._abortController.signal
     })
