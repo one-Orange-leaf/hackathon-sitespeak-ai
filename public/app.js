@@ -1,3 +1,5 @@
+import { animateButtonRecord, animateButtonIdle, animatePanelIn, animateSendSuccess, animateResultCascade } from './motion.js'
+
 // ═══════════════════════════════════════════
 // CONSTANTS
 // ═══════════════════════════════════════════
@@ -53,9 +55,12 @@ const appState = {
   mediaRecorder:        null,
   _recordingTimer:      null,
   _stillProcessingTimer: null,
+  _abortController:     null,
 
   // Last result (for Phase B traceability)
-  lastResponse: null
+  lastResponse: null,
+  lastTask:     null,
+  meta:         null
 }
 
 // ═══════════════════════════════════════════
@@ -66,8 +71,8 @@ const STATUS_TEXT = {
   recording:   'RECORDING',
   transcribing:'TRANSCRIBING',
   confirming:  'CONFIRM',
-  processing:  'SENDING',
-  result:      'SUBMITTED',
+  sending:     'SENDING',
+  done:        'SUBMITTED',
   error:       'ERROR'
 }
 
@@ -82,9 +87,9 @@ function setState(state) {
   }
   setText('loading-text', '')
 
-  if (state === 'processing') {
+  if (state === 'sending') {
     appState._stillProcessingTimer = setTimeout(() => {
-      if (document.body.dataset.state === 'processing') {
+      if (document.body.dataset.state === 'sending') {
         setText('loading-text', 'Still processing…')
       }
     }, STILL_PROCESSING_MS)
@@ -115,19 +120,19 @@ function parseIdentityFromURL() {
 function initGeolocation() {
   appState.gpsState = 'pending'
   if (!navigator.geolocation) {
-    appState.gpsState = 'unavailable'
+    appState.gpsState = 'failed'
     return
   }
   navigator.geolocation.getCurrentPosition(
     pos => {
       appState.gpsCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude }
-      appState.gpsState  = 'granted'
+      appState.gpsState  = 'resolved'
       reverseGeocode(appState.gpsCoords.lat, appState.gpsCoords.lng)
         .then(label => { appState.locationLabel = label })
         .catch(()   => { appState.locationLabel = null })
     },
     () => {
-      appState.gpsState  = 'denied'
+      appState.gpsState  = 'failed'
       appState.gpsCoords = null
     },
     { timeout: 10000, maximumAge: 60000 }
@@ -238,10 +243,9 @@ function getSupportedMimeType() {
   const types = [
     'audio/webm;codecs=opus',
     'audio/webm',
-    'audio/mp4;codecs=mp4a.40.2',
-    'audio/mp4',
     'audio/ogg;codecs=opus',
     'audio/ogg',
+    'audio/mp4',
     ''
   ]
   return types.find(t => t === '' || MediaRecorder.isTypeSupported(t)) ?? ''
@@ -280,6 +284,7 @@ function startRecording() {
       appState.mediaRecorder.start()
       setState('recording')
       setText('record-label', 'STOP')
+      animateButtonRecord(document.getElementById('record-btn'))
 
       appState._recordingTimer = setTimeout(() => {
         if (document.body.dataset.state === 'recording') stopRecording()
@@ -298,6 +303,7 @@ function stopRecording() {
     appState.mediaRecorder.stop()
   }
   setText('record-label', 'RECORD')
+  animateButtonIdle(document.getElementById('record-btn'))
 }
 
 // ═══════════════════════════════════════════
@@ -305,6 +311,7 @@ function stopRecording() {
 // ═══════════════════════════════════════════
 async function enterConfirming() {
   setState('confirming')
+  animatePanelIn('#confirm-panel')
 
   // Identity
   setText('confirm-worker', appState.worker ? `Worker: ${appState.worker}` : 'Worker: —')
@@ -331,7 +338,8 @@ async function enterConfirming() {
       formData.append('audio',    appState.audioBlob)
       formData.append('mimeType', appState.audioMimeType)
 
-      const res  = await fetchWithRetry('/api/transcribe', { method: 'POST', body: formData })
+      appState._abortController = new AbortController()
+      const res  = await fetchWithRetry('/api/transcribe', { method: 'POST', body: formData, signal: appState._abortController.signal })
       const data = await res.json()
 
       appState.transcript       = sanitise(data.transcript || '')
@@ -426,28 +434,33 @@ async function handleSubmit() {
     return
   }
 
-  setState('processing')
+  setState('sending')
+  appState._abortController = new AbortController()
 
   const body = {
-    transcript:  appState.transcript || '',
-    photoBase64: appState.photoDataUrl ? appState.photoDataUrl.split(',')[1] : null,
-    mimeType:    'image/jpeg',
-    worker:      appState.worker,
-    site:        appState.site,
-    lat:         appState.gpsCoords?.lat ?? null,
-    lng:         appState.gpsCoords?.lng ?? null
+    transcript:        appState.transcript || '',
+    photoBase64:       appState.photoDataUrl ? appState.photoDataUrl.split(',')[1] : null,
+    mimeType:          'image/jpeg',
+    worker:            appState.worker,
+    site:              appState.site,
+    lat:               appState.gpsCoords?.lat ?? null,
+    lng:               appState.gpsCoords?.lng ?? null,
+    locationLabel:     appState.locationLabel || null,
+    detectedLanguage:  appState.detectedLanguage || 'en'
   }
 
   try {
     const res  = await fetchWithRetry('/api/analyze', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(body)
+      body:    JSON.stringify(body),
+      signal:  appState._abortController.signal
     })
     const data = await res.json()
     appState.lastResponse = data
     renderResultPanel(data)
-    setState('result')
+    setState('done')
+    animateSendSuccess()
   } catch (err) {
     console.error('[submit]', err.message)
     showError('Could not reach the server. Please check your connection and try again.')
@@ -457,6 +470,8 @@ async function handleSubmit() {
 function renderResultPanel(data) {
   const task = data.task || {}
   const meta = data.meta || {}
+  appState.lastTask = task
+  appState.meta     = meta
   const urgency = task.urgency || 'medium'
 
   // Urgency badge (colour class) + priority text field
@@ -470,6 +485,8 @@ function renderResultPanel(data) {
   setText('result-title',    task.task_title || '—')
   setText('result-category', CATEGORY_LABELS[task.category] || task.category || '—')
   setText('result-summary',  task.summary    || '—')
+  animateResultCascade(document.getElementById('result-title'))
+  animateResultCascade(document.getElementById('result-summary'))
 
   // Materials pills
   const materialsRow = document.getElementById('result-materials-row')
@@ -524,6 +541,11 @@ function handleRestart(e) {
 }
 
 function clearAppState() {
+  appState._abortController?.abort()
+  appState._abortController = null
+  clearTimeout(appState._recordingTimer)
+  appState._recordingTimer  = null
+
   appState.photoFile        = null
   appState.photoDataUrl     = null
   appState.audioBlob        = null
@@ -582,6 +604,7 @@ async function fetchWithRetry(url, options, retries = 1, delayMs = 3000) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     return res
   } catch (err) {
+    if (err.name === 'AbortError') throw err
     if (retries > 0) {
       await new Promise(r => setTimeout(r, delayMs))
       return fetchWithRetry(url, options, retries - 1, delayMs)

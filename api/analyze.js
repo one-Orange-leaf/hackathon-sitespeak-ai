@@ -63,7 +63,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { transcript, photoBase64, mimeType, worker, site, lat, lng } = req.body
+    const { transcript, photoBase64, mimeType, worker, site, lat, lng, locationLabel, detectedLanguage } = req.body
 
     const sanitisedTranscript = sanitise(transcript)
 
@@ -113,7 +113,7 @@ export default async function handler(req, res) {
       site_id:        site   || null,
       submitted_at:   new Date().toISOString(),
       coordinates:    hasCoords ? { lat: parseFloat(lat), lng: parseFloat(lng) } : null,
-      location_label: null,
+      location_label: locationLabel || null,
       maps_link:      hasCoords ? `https://maps.google.com/?q=${lat},${lng}` : null,
       requests_used:  requestCount,
       requests_max:   MAX_REQUESTS,
@@ -146,7 +146,7 @@ export default async function handler(req, res) {
       meta,
       task:              analysis,
       transcript:        sanitisedTranscript,
-      detected_language: 'en',
+      detected_language: detectedLanguage || 'en',
       webhook_ok,
     })
   } catch (err) {

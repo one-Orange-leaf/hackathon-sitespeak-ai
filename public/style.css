@@ -1,17 +1,47 @@
 
 :root {
-  --color-bg:       #111111;
-  --color-surface:  #1e1e1e;
-  --color-accent:   #f5a623;
-  --color-on-accent:#111111;
-  --color-error:    #e53935;
-  --color-on-error: #ffffff;
-  --color-text:     #f0f0f0;
-  --color-muted:    #888888;
-  --color-border:   #333333;
-  --font-main:      'Barlow Condensed', sans-serif;
-  --radius:         12px;
-  --map-height:     180px;
+  /* Base colours */
+  --color-bg:            #111111;
+  --color-surface:       #1c1c1c;
+  --color-surface-alt:   #252525;
+  --color-accent:        #FFD600;
+  --color-on-accent:     #111111;
+  --color-text:          #E8E8E8;
+  --color-text-muted:    #777777;
+  --color-muted:         #777777;
+  --color-active:        #00FF41;
+  --color-error:         #FF4444;
+  --color-on-error:      #ffffff;
+  --color-border:        #2e2e2e;
+  --color-border-accent: #FFD600;
+  /* Urgency */
+  --color-urgency-high:        #FF8C00;
+  --color-urgency-high-bg:     rgba(255, 140, 0, 0.15);
+  --color-urgency-critical:    #FF4444;
+  --color-urgency-critical-bg: rgba(255, 68, 68, 0.15);
+  --color-urgency-medium-bg:   rgba(255, 214, 0, 0.12);
+  --color-urgency-low:         #66bb6a;
+  --color-urgency-low-bg:      #1a2a1a;
+  /* Typography */
+  --font-main:    'Barlow Condensed', sans-serif;
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-mono:    'Courier New', Courier, monospace;
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  /* Sizing */
+  --btn-record-size: 160px;
+  --radius:          12px;
+  --radius-sm:       2px;
+  --border-width:    2px;
+  --map-height:      180px;
+  /* Transitions */
+  --transition-fast: 100ms ease;
+  --transition-base: 220ms ease;
+  --transition-slow: 380ms ease;
 }
  
 /* ═══════════════════════════════════════════
@@ -130,16 +160,16 @@ body[data-state="confirming"] #confirm-panel {
   display: flex;
 }
  
-/* processing — confirm-panel visible, loading block shown */
-body[data-state="processing"] #confirm-panel {
+/* sending — confirm-panel visible, loading block shown */
+body[data-state="sending"] #confirm-panel {
   display: flex;
 }
-body[data-state="processing"] #confirm-loading {
+body[data-state="sending"] #confirm-loading {
   display: flex;
 }
- 
-/* result */
-body[data-state="result"] #result-panel {
+
+/* done */
+body[data-state="done"] #result-panel {
   display: flex;
 }
  
@@ -210,10 +240,16 @@ body[data-state="error"] #error-panel {
   font-size: 0.85rem;
 }
  
-/* recording pulse */
+/* recording pulse — soft scale for record button */
 @keyframes record-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%       { opacity: 0.7; transform: scale(1.06); }
+}
+
+/* critical urgency blink — sharp steps for urgency badge */
+@keyframes pulse-record {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
 }
  
 body[data-state="recording"] #record-btn {
@@ -283,6 +319,10 @@ body[data-state="recording"] #record-btn {
 }
  
 /* ─── Identity block ─── */
+body[data-identity="none"] #confirm-identity-block {
+  display: none;
+}
+
 #confirm-identity-block {
   display: flex;
   flex-direction: column;
@@ -454,10 +494,10 @@ body.has-photo #confirm-photo-add {
   align-self: flex-start;
 }
  
-#result-urgency-badge.urgency-low      { background: #1a2a1a; color: #66bb6a; }
-#result-urgency-badge.urgency-medium   { background: #2a2200; color: var(--color-accent); }
-#result-urgency-badge.urgency-high     { background: #2a1500; color: #ff8c00; }
-#result-urgency-badge.urgency-critical { background: #2a0000; color: var(--color-error); }
+#result-urgency-badge.urgency-low      { background: var(--color-urgency-low-bg);      color: var(--color-urgency-low); }
+#result-urgency-badge.urgency-medium   { background: var(--color-urgency-medium-bg);   color: var(--color-accent); }
+#result-urgency-badge.urgency-high     { background: var(--color-urgency-high-bg);     color: var(--color-urgency-high); }
+#result-urgency-badge.urgency-critical { background: var(--color-urgency-critical-bg); color: var(--color-urgency-critical); animation: pulse-record 0.8s steps(1) infinite; }
  
 .result-label {
   font-size: 0.7rem;

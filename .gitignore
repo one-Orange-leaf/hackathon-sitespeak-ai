@@ -1,10 +1,10 @@
-# Dependencies
-node_modules/
-
-# Environment variables
-.env
+# Environment variables — .env.local must be first entry
 .env.local
 .env.*.local
+.env
+
+# Dependencies
+node_modules/
 
 # Vercel
 .vercel/
