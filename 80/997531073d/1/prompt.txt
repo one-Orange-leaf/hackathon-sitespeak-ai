@@ -1,0 +1,1 @@
+we do not care about the images - check all the other files and compare them with our current build to troubleshoot the persisting error when we try to send

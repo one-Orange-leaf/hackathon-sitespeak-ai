@@ -4,20 +4,28 @@
   "strategy": "manual-commit",
   "branch": "main",
   "checkpoints_count": 1,
-  "files_touched": null,
+  "files_touched": [
+    "vercel.json"
+  ],
   "sessions": [
     {
       "metadata": "/80/997531073d/0/metadata.json",
       "transcript": "/80/997531073d/0/full.jsonl",
       "content_hash": "/80/997531073d/0/content_hash.txt",
       "prompt": "/80/997531073d/0/prompt.txt"
+    },
+    {
+      "metadata": "/80/997531073d/1/metadata.json",
+      "transcript": "/80/997531073d/1/full.jsonl",
+      "content_hash": "/80/997531073d/1/content_hash.txt",
+      "prompt": "/80/997531073d/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 83,
-    "cache_creation_tokens": 128028,
-    "cache_read_tokens": 2637861,
-    "output_tokens": 51459,
-    "api_call_count": 53
+    "input_tokens": 92,
+    "cache_creation_tokens": 150606,
+    "cache_read_tokens": 3397238,
+    "output_tokens": 63490,
+    "api_call_count": 60
   }
 }
