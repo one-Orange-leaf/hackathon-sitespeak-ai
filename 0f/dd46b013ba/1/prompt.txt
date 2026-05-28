@@ -1,0 +1,28 @@
+stage and push
+
+---
+
+The 18:21 errors are 400, not 500 — different from before. And the confirm panel screenshot shows a valid transcript ("Ηλεκτρολόγος, πάντος όροφος, σωλήνες, καλοβίωση.") plus a photo. So content exists — this isn't an empty content array.
+
+A 400 from Anthropic with actual content means one thing: the image block is malformed. Most likely the base64 data has the data URL prefix still attached.
+
+The API expects raw base64:
+
+/9j/4AAQSkZJRgAB...
+
+But if compressImage() is returning the full data URL, analyze.js is sending:
+
+data:image/jpeg;base64,/9j/4AAQSkZJRgAB...
+
+That's a 400 — invalid image source.
+
+Tell Claude Code:
+
+    The error is now POST 400 on /api/analyze with a valid transcript AND a photo present. The image block is being sent with the data URL prefix intact. In analyze.js, wherever the base64 image field is used to construct the Anthropic message, strip the prefix before passing it:
+    js
+
+    const cleanBase64 = base64String.replace(/^data:image\/\w+;base64,/, '')
+
+    Show me that line before and after the fix.
+
+Check the Vercel log message column for the 18:21 entries to confirm — it should say something about invalid base64 or invalid image source.
