@@ -1,0 +1,36 @@
+<ide_opened_file>The user opened the file /home/student/hackathon-sitespeak-ai/TESTING.md in the IDE. This may or may not be related to the current task.</ide_opened_file>
+validate that we are running the proper main branch of the correct repo - 
+
+https://github.com/one-Orange-leaf/hackathon-sitespeak-ai
+5:14 PM
+
+Confirmed on both counts.
+
+Repo: Vercel is cloning github.com/one-Orange-leaf/hackathon-sitespeak-ai, branch main. That matches your target repo exactly.
+
+Production serving: 02b60c1 — "docs: remove stale HACKATHON_PROMPT.md..." — Ready, 1 day ago. Domain sitespeak-ai.vercel.app is live on this commit.
+
+The build error is in vercel.json. The error is unambiguous:
+
+Error: Function Runtimes must have a valid version, for example 'now-php@1.0.0'.
+
+Your vercel.json currently specifies "runtime": "nodejs20.x" for both functions. Vercel CLI 54.4.1 (which ran this build) no longer accepts that format. The valid format for current Vercel is just omitting the runtime field entirely (it defaults to the correct Node version), or using the functions block without a runtime key.
+
+Fix — in Claude Code, edit vercel.json:
+
+Remove the "runtime": "nodejs20.x" lines from both function entries. The maxDuration values stay. Result:
+json
+
+{
+  "functions": {
+    "api/analyze.js": { "maxDuration": 45 },
+    "api/transcribe.js": { "maxDuration": 30 }
+  }
+}
+
+Commit and push. Vercel will redeploy from main automatically. Build should pass in under 10 seconds.
+
+⚠️ DOCS OUT OF SYNC
+Changed: vercel.json runtime field removed — nodejs20.x format rejected by Vercel CLI 54.4.1
+Affects: CLAUDE.md (vercel.json section), ARCHITECTURE.md (stack table)
+Action: Re-upload both after this session.
