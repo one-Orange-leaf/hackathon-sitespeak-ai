@@ -6,7 +6,7 @@
 ---
 
 ## Step 1 — Project Scaffold
-**Time:** [fill in]
+**Time:** 10.30
 **Files:** .gitignore, package.json, vercel.json
 **Commit:** chore: project scaffold, package.json, vercel config
 **Why:** Establish project identity, declare the single npm dependency
@@ -15,3 +15,15 @@ before writing any application code.
 **Claude Code prompt:** Scoped to scaffold only — no application logic.
 
 ---
+
+## Step 2 — HTML Skeleton
+**Time:** 11:50
+**Files:** public/index.html
+**Commit:** feat: html skeleton with state-driven panels
+**Why:** Markup-only skeleton defines every panel and element ID the app needs.
+CSS and JS reference these IDs — clean separation of concerns means the
+designer owns style.css exclusively and never touches app logic.
+**Claude Code prompt:** Scoped to markup structure only.
+
+---
+
