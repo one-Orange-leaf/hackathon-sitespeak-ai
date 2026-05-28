@@ -1,0 +1,20 @@
+<ide_opened_file>The user opened the file /home/student/hackathon-sitespeak-ai/api/analyze.js in the IDE. This may or may not be related to the current task.</ide_opened_file>
+Critical detail here: "No outgoing requests" and execution duration 13ms.
+
+The function is returning 400 in 13ms without ever calling the Anthropic API. This is the server-side guard firing — content.length === 0 — which means the content array is empty despite the transcript and photo being present on the phone.
+
+The data is not making it from the request body into the content array. The most likely cause: the request body isn't being parsed correctly. The function is receiving the POST but req.body fields (photoBase64, transcript, mimeType) are all undefined or null, so both guards fail and content stays empty.
+
+Tell Claude Code:
+
+    The 18:37 log shows execution duration 13ms and no outgoing requests — the Anthropic API was never called. The server-side content.length === 0 guard is firing, meaning cleanBase64 and sanitisedTranscript are both falsy when they arrive. The request body is not being parsed. Check how analyze.js reads the request body — it must manually parse the raw JSON since bodyParser: false is set for transcribe.js. Confirm whether analyze.js has its own body parsing, and if not, add it:
+    js
+
+    const chunks = []
+    for await (const chunk of req) chunks.push(chunk)
+    const body = JSON.parse(Buffer.concat(chunks).toString())
+    const { transcript, photoBase64, mimeType, ... } = body
+
+    Show me the current body-reading code in analyze.js before applying any fix.
+
+bodyParser: false in vercel.json disables parsing globally — analyze.js needs to read the raw stream itself, the same way transcribe.js does.
