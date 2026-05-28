@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Construction site voice note logger">
+  <meta name="gmaps-key" content="REPLACE_WITH_KEY_AT_DEPLOY">
+  <title>SiteSpeak AI</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>document.documentElement.dataset.gmapsKey = document.querySelector('meta[name="gmaps-key"]')?.content || ''</script>
+</head>
+<body data-state="idle">
+
+  <div id="app">
+
+    <header id="header">
+      <div id="logo-block">
+        <span id="logo">SiteSpeak</span>
+        <span id="logo-sub">Construction Site Voice Logger</span>
+      </div>
+      <span id="usage-counter"></span>
+    </header>
+
+    <main id="main">
+
+      <!-- ─── VOICE / IDLE / RECORDING / TRANSCRIBING ─── -->
+      <div id="voice-mode">
+
+        <div id="photo-bar">
+          <label id="photo-label" for="photo-input">
+            &#128247; <span id="photo-status">Add photo</span>
+          </label>
+          <input type="file" id="photo-input" accept="image/*" hidden>
+        </div>
+
+        <button id="record-btn" type="button">
+          <span id="record-icon">&#127897;</span>
+          <span id="record-label">RECORD</span>
+        </button>
+
+        <p id="record-hint">Speak clearly. Describe the problem.</p>
+        <p id="transcribing-hint" aria-live="polite"></p>
+
+      </div>
+
+      <div id="status-bar" role="status" aria-live="polite">
+        <span id="status-label">[STATUS]</span>
+        <span id="status-text">READY</span>
+      </div>
+
+      <!-- ─── CONFIRM PANEL ─── -->
+      <section id="confirm-panel" aria-label="Confirm note before sending">
+
+        <div id="confirm-identity-block">
+          <span class="panel-label">[IDENTITY]</span>
+          <p id="confirm-worker"></p>
+          <p id="confirm-site"></p>
+        </div>
+
+        <div id="confirm-photo-block">
+          <span class="panel-label">[PHOTO]</span>
+          <img id="confirm-photo-preview" src="" alt="Site photo">
+          <p id="confirm-photo-none">No photo</p>
+        </div>
+
+        <div id="confirm-photo-add">
+          <label id="photo-label-confirm" for="photo-input-confirm">&#128247; Add photo</label>
+          <input type="file" id="photo-input-confirm" accept="image/*" hidden>
+        </div>
+
+        <div id="confirm-transcript-block">
+          <span class="panel-label">[TRANSCRIPT]</span>
+          <p id="confirm-transcript"></p>
+        </div>
+
+        <div id="confirm-gps-block">
+          <span class="panel-label">[LOCATION]</span>
+          <p id="confirm-gps"></p>
+        </div>
+
+        <div id="confirm-map-block">
+          <span class="panel-label">[MAP]</span>
+          <img id="confirm-map-img" src="" alt="Location map">
+          <p id="confirm-map-unavailable">Location could not be determined. Submission will proceed without coordinates.</p>
+        </div>
+
+        <div id="confirm-loading" aria-live="polite">
+          <span id="loading-text"></span>
+        </div>
+
+        <button id="readback-btn" type="button">&#128266; Read back</button>
+        <button id="submit-btn" type="button">SEND REPORT</button>
+        <button id="cancel-btn" type="button">Cancel</button>
+
+      </section>
+
+      <!-- ─── RESULT PANEL ─── -->
+      <section id="result-panel">
+
+        <div id="result-urgency-badge"></div>
+
+        <p class="result-label">TASK</p>
+        <p id="result-title"></p>
+
+        <p class="result-label">CATEGORY</p>
+        <p id="result-category"></p>
+
+        <p class="result-label">URGENCY</p>
+        <p id="result-priority"></p>
+
+        <p class="result-label">SUMMARY</p>
+        <p id="result-summary"></p>
+
+        <div id="result-materials-row">
+          <span class="panel-label">[MATERIALS]</span>
+          <div id="result-materials"></div>
+        </div>
+
+        <hr id="result-divider">
+
+        <div id="result-meta-row">
+          <span class="result-label" id="result-meta-worker"></span>
+          <span class="result-label" id="result-meta-site"></span>
+          <span class="result-label" id="result-meta-coords"></span>
+          <span class="result-label" id="webhook-status" aria-live="polite"></span>
+        </div>
+
+        <p id="result-trello-note">Sent to Trello in English</p>
+
+        <div id="result-worker-input-block">
+          <span class="panel-label">[WORKER INPUT]</span>
+          <p id="result-transcript"></p>
+        </div>
+
+        <button id="restart-btn" type="button">NEW REPORT</button>
+
+      </section>
+
+      <!-- ─── ERROR PANEL ─── -->
+      <section id="error-panel">
+        <p id="error-message"></p>
+        <button id="error-restart-btn" type="button">TRY AGAIN</button>
+      </section>
+
+    </main>
+
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
