@@ -430,7 +430,9 @@ function handleReadback() {
 // SUBMIT
 // ═══════════════════════════════════════════
 async function handleSubmit() {
-  if (!appState.transcript && !appState.photoDataUrl) {
+  const hasTranscript = appState.transcript && appState.transcript.trim().length > 0
+  const hasPhoto      = appState.photoDataUrl && appState.photoDataUrl.includes(',')
+  if (!hasTranscript && !hasPhoto) {
     showError('Please record a voice note or add a photo.')
     return
   }
