@@ -21,6 +21,15 @@ const SYSTEM_PROMPT =
 
 const CATEGORY_ENUM = ['electrical', 'plumbing', 'structural', 'materials', 'safety', 'inspection', 'other']
 
+function readBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = []
+    req.on('data', chunk => chunks.push(chunk))
+    req.on('end', () => resolve(Buffer.concat(chunks)))
+    req.on('error', reject)
+  })
+}
+
 function setCors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
@@ -61,9 +70,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const chunks = []
-    for await (const chunk of req) chunks.push(chunk)
-    const body = JSON.parse(Buffer.concat(chunks).toString())
+    const body = JSON.parse((await readBody(req)).toString())
     const { transcript, photoBase64, mimeType, worker, site, lat, lng, locationLabel, detectedLanguage } = body
 
     const sanitisedTranscript = sanitise(transcript)
