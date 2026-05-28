@@ -1,0 +1,11 @@
+<ide_opened_file>The user opened the file /home/student/hackathon-sitespeak-ai/TESTING.md in the IDE. This may or may not be related to the current task.</ide_opened_file>
+run TESTING.md
+
+---
+
+1. proceed with fixing
+2. review and validate
+
+---
+
+mark -passed - all the tests on testing.md that passed

@@ -1,0 +1,58 @@
+{
+  "cli_version": "0.6.3",
+  "checkpoint_id": "f285db220fa1",
+  "session_id": "3f3a8de9-497d-4bae-94f9-472fcd33857d",
+  "strategy": "manual-commit",
+  "created_at": "2026-05-28T14:06:23.363742823Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "files_touched": [
+    ".gitignore",
+    "TESTING.md",
+    "api/analyze.js",
+    "public/app.js",
+    "public/motion.js",
+    "public/style.css"
+  ],
+  "agent": "Claude Code",
+  "model": "",
+  "turn_id": "7450a407b422",
+  "token_usage": {
+    "input_tokens": 53,
+    "cache_creation_tokens": 210369,
+    "cache_read_tokens": 3516419,
+    "output_tokens": 53720,
+    "api_call_count": 41
+  },
+  "session_metrics": {
+    "turn_count": 3
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-05-28T14:06:23.343219945Z",
+    "agent_lines": 289,
+    "agent_removed": 184,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 289,
+    "total_lines_changed": 473,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 188,
+      "agent_lines_removed": 95
+    }
+  ]
+}
