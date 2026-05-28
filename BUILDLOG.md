@@ -6,7 +6,7 @@
 ---
 
 ## Step 1 — Project Scaffold
-**Time:** 10.30
+**Time:** 10.30am
 **Files:** .gitignore, package.json, vercel.json
 **Commit:** chore: project scaffold, package.json, vercel config
 **Why:** Establish project identity, declare the single npm dependency
@@ -17,7 +17,7 @@ before writing any application code.
 ---
 
 ## Step 2 — HTML Skeleton
-**Time:** 11:50
+**Time:** 11:50am
 **Files:** public/index.html
 **Commit:** feat: html skeleton with state-driven panels
 **Why:** Markup-only skeleton defines every panel and element ID the app needs.
