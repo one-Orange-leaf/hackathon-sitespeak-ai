@@ -28,11 +28,7 @@ designer owns style.css exclusively and never touches app logic.
 ---
 
 ## Step 3 — Stylesheet
-<<<<<<< HEAD
-**Time:** [fill in]
-=======
 **Time:** 12:20pm
->>>>>>> 4daf9ed9724c7ab9bb2e3bc0efad767f443adb60
 **Files:** public/style.css
 **Commit:** feat: mobile-first stylesheet with state machine visibility
 **Why:** All show/hide logic lives in CSS via body[data-state] (idle, recording, transcribing, confirming, sending, done, error) selectors. 
@@ -48,6 +44,48 @@ Designer can restyle freely without touching app logic.
 **Why:** Core brain of the frontend. State machine drives all UI transitions. 
 GPS requested on load only — never mid-flow. Photo compressed before transmission 
 to keep API costs low (~1600 tokens vs 6000+ uncompressed).
+
+---
+
+## Step 5 — Transcription Endpoint
+**Time:** 13:00
+**Files:** api/transcribe.js
+**Commit:** feat: whisper transcription endpoint with multipart parsing
+**Why:** Separate transcription endpoint means Whisper errors surface before 
+Claude is called — cleaner debugging. verbose_json returns detected_language 
+in one pass, no second API call needed. bodyParser: false is mandatory — 
+Vercel's default parser corrupts raw binary audio.
+
+---
+
+## Step 6 — Analysis Endpoint
+**Time:** 13.15
+**Files:** api/analyze.js
+**Commit:** feat: claude haiku extraction, forced tool use, make.com webhook
+**Why:** Forced tool use (tool_choice: tool) guarantees structured JSON — no 
+prompt-engineering tricks, no JSON.parse on free text. Webhook is awaited and 
+status returned to client. 50-request cap protects demo budget (total cost ~$0.05-0.07).
+
+---
+
+## Step 7 — Motion Helpers
+**Time:** 13:35
+**Files:** public/motion.js
+**Commit:** feat: motion helpers for UI animations
+**Why:** Lightweight animation layer — pulseElement() and fadeIn() add tactile 
+feedback to state transitions without any external dependency. Defensive design: 
+both functions null-check the element before animating so a missing DOM node 
+never throws. Optional layer — app works fully without it.
+
+---
+
+## Step 8 — PWA
+**Time:** 13:45
+**Files:** public/sw.js, public/manifest.json
+**Commit:** feat: service worker and PWA manifest
+**Why:** Service worker enables offline error handling on API routes and 
+installable PWA on Android Chrome. Cache versioned — increment on every 
+deploy to force fresh files to installed clients.
 
 ---
 
