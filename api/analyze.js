@@ -1,7 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-export const config = { api: { bodyParser: { sizeLimit: '10mb' } } }
-
 const MAX_REQUESTS = 50
 let requestCount = 0
 let resetTime = Date.now() + 12 * 60 * 60 * 1000
@@ -63,7 +61,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { transcript, photoBase64, mimeType, worker, site, lat, lng, locationLabel, detectedLanguage } = req.body
+    const chunks = []
+    for await (const chunk of req) chunks.push(chunk)
+    const body = JSON.parse(Buffer.concat(chunks).toString())
+    const { transcript, photoBase64, mimeType, worker, site, lat, lng, locationLabel, detectedLanguage } = body
 
     const sanitisedTranscript = sanitise(transcript)
 
