@@ -71,13 +71,16 @@ export default async function handler(req, res) {
       ? photoBase64.replace(/^data:[^;]+;base64,/, '')
       : null
 
+    const ALLOWED_MIME  = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    const safeMediaType = ALLOWED_MIME.includes(mimeType) ? mimeType : 'image/jpeg'
+
     const content = []
     if (cleanBase64) {
       content.push({
         type: 'image',
         source: {
           type:       'base64',
-          media_type: mimeType || 'image/jpeg',
+          media_type: safeMediaType,
           data:       cleanBase64,
         },
       })
