@@ -1,4 +1,4 @@
-const CACHE = 'sitespeak-v1'
+const CACHE = 'sitespeak-v4'
 const SHELL = [
   '/',
   '/index.html',
