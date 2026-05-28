@@ -1,0 +1,96 @@
+merge with main
+
+---
+
+<ide_opened_file>The user opened the file /home/student/hackathon-sitespeak-ai/BUILDLOG.md in the IDE. This may or may not be related to the current task.</ide_opened_file>
+Create public/index.html for a mobile-first PWA called SiteSpeak AI.
+
+Requirements:
+- Markup only. Zero inline styles. Zero inline scripts.
+- All state-based visibility driven by body[data-state] CSS attribute selectors.
+- States: idle, recording, confirming, processing, result, error
+- Panels: #idle-panel, #recording-panel, #confirm-panel, #processing-panel, #result-panel, #error-panel
+- idle-panel: #start-btn (large tap target), #worker-info (site + worker name display)
+- recording-panel: #stop-btn, #record-hint paragraph, #voice-mode wrapper div
+- confirm-panel in order: identity block, photo display (#confirm-photo), 
+  #photo-label-confirm inside #confirm-photo-add div, transcript block (#transcript-text), 
+  GPS block (#gps-text), map block (#map-img), #readback-btn, #submit-btn, #cancel-btn
+- result-panel: #result-title, #result-category, #result-priority, #result-summary, 
+  #result-meta-row with class result-label spans, #restart-btn
+- error-panel: #error-message, #error-restart-btn
+- One file input: #photo-input, accept="image/*", hidden
+- One meta tag for Google Maps key: name="maps-key" content=""
+- PWA meta tags: viewport, theme-color, apple-mobile-web-app-capable
+- Link to style.css and app.js
+
+---
+
+<ide_opened_file>The user opened the file /home/student/hackathon-sitespeak-ai/public/index.html in the IDE. This may or may not be related to the current task.</ide_opened_file>
+Create public/index.html for a mobile-first PWA called SiteSpeak AI.
+
+Rules:
+- English throughout. Markup only. Zero inline styles.
+- One permitted inline script: reads meta[name="gmaps-key"] content into 
+  document.documentElement.dataset.gmapsKey
+- All state-based visibility driven by body[data-state] CSS selectors
+- No textarea fallback. No capture attribute on any file input.
+
+Head block (exact order):
+- charset UTF-8
+- viewport: width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no
+- theme-color: #111111
+- apple-mobile-web-app-capable: yes
+- apple-mobile-web-app-status-bar-style: black-translucent
+- description: Construction site voice note logger
+- meta name="gmaps-key" content="REPLACE_WITH_KEY_AT_DEPLOY"
+- title: SiteSpeak AI
+- link rel=manifest href=/manifest.json
+- preconnect to fonts.googleapis.com and fonts.gstatic.com
+- Google Font: Barlow Condensed weights 400;600;700
+- link to style.css
+
+Body structure (exact IDs):
+- body data-state="idle"
+- div#app containing:
+  - header#header with div#logo-block (span#logo "SiteSpeak", span#logo-sub 
+    "Construction Site Voice Logger") and span#usage-counter
+  - main#main containing:
+    - div#voice-mode containing:
+      - div#photo-bar with label#photo-label for="photo-input" containing 
+        📷 and span#photo-status "Add photo", plus hidden input#photo-input accept="image/*"
+      - button#record-btn with span#record-icon 🎙 and span#record-label "RECORD"
+      - p#record-hint "Speak clearly. Describe the problem."
+      - p#transcribing-hint aria-live="polite"
+    - div#status-bar role=status aria-live=polite with span#status-label "[STATUS]" 
+      and span#status-text "READY"
+  - section#confirm-panel aria-label="Confirm note before sending" containing:
+    - div#confirm-identity-block: span.panel-label "[IDENTITY]", p#confirm-worker, p#confirm-site
+    - div#confirm-photo-block: span.panel-label "[PHOTO]", img#confirm-photo-preview, 
+      p#confirm-photo-none "No photo"
+    - div#confirm-photo-add: label#photo-label-confirm for="photo-input-confirm" 
+      "📷 Add photo", input#photo-input-confirm accept="image/*"
+    - div#confirm-transcript-block: span.panel-label "[TRANSCRIPT]", p#confirm-transcript
+    - div#confirm-gps-block: span.panel-label "[LOCATION]", p#confirm-gps
+    - div#confirm-map-block: span.panel-label "[MAP]", img#confirm-map-img, 
+      p#confirm-map-unavailable "Location could not be determined. Submission will proceed without coordinates."
+    - div#confirm-loading aria-live=polite with span#loading-text
+    - button#readback-btn "🔊 Read back"
+    - button#submit-btn "SEND REPORT"
+    - button#cancel-btn "Cancel"
+  - section#result-panel containing:
+    - p.result-label + p#result-title
+    - p.result-label + p#result-category
+    - p.result-label + p#result-priority
+    - p.result-label + p#result-summary
+    - div#result-meta-row with span.result-label elements for worker, site, coords, webhook status
+    - div#result-worker-input-block: span.panel-label "[WORKER INPUT]", p#result-transcript
+    - button#restart-btn "NEW REPORT"
+  - section#error-panel containing:
+    - p#error-message
+    - button#error-restart-btn "TRY AGAIN"
+
+Load app.js as last element before </body>:
+  <script type="module" src="app.js"></script>
+
+
+Review and validate
