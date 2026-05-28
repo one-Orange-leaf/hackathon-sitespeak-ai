@@ -67,14 +67,18 @@ export default async function handler(req, res) {
 
     const sanitisedTranscript = sanitise(transcript)
 
+    const cleanBase64 = typeof photoBase64 === 'string'
+      ? photoBase64.replace(/^data:[^;]+;base64,/, '')
+      : null
+
     const content = []
-    if (photoBase64) {
+    if (cleanBase64) {
       content.push({
         type: 'image',
         source: {
           type:       'base64',
           media_type: mimeType || 'image/jpeg',
-          data:       photoBase64,
+          data:       cleanBase64,
         },
       })
     }
