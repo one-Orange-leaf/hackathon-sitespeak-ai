@@ -78,7 +78,7 @@ export default async function handler(req, res) {
         },
       })
     }
-    content.push({ type: 'text', text: sanitisedTranscript })
+    if (sanitisedTranscript) content.push({ type: 'text', text: sanitisedTranscript })
 
     const response = await client.messages.create({
       model:       'claude-haiku-4-5',
