@@ -1,0 +1,28 @@
+stage and push
+
+---
+
+The error has changed — that's important. Two distinct errors now:
+
+18:07 errors (old):
+
+    messages: text content blocks must be non-empty
+
+18:14 errors (new, after fix attempt):
+
+    messages.0: user messages must have non-empty content
+
+The fix attempt made it worse. Now the entire content array is empty — meaning the conditional that was supposed to build contentBlocks is producing an empty array [] and passing that as the message content.
+
+What happened: Claude Code probably fixed the text block guard but broke the image block inclusion, or the conditional is wrong and both blocks are being skipped.
+
+Tell Claude Code exactly this:
+
+    The fix produced a regression. The error is now messages.0: user messages must have non-empty content — the content array itself is empty. Show me the current message construction block in analyze.js verbatim, then fix it so:
+
+        If image + transcript: both blocks included
+        If image only: image block only, no text block
+        If transcript only: text block only, no image block
+        Never pass an empty content array
+
+The logic is simple but needs to be explicit. Don't let it guess — have it show you the code first before applying another fix.
