@@ -1,0 +1,45 @@
+<ide_opened_file>The user opened the file /home/student/hackathon-sitespeak-ai/api/analyze.js in the IDE. This may or may not be related to the current task.</ide_opened_file>
+The current error sequence is consistent and clear:
+18:27:36  POST 200  /api/transcribe   ← Whisper working
+18:27:52  POST 400  /api/analyze      ← Anthropic rejecting
+18:27:55  POST 400  /api/analyze      ← retry also rejected
+400 from Anthropic, with transcript present and photo present. The empty-content-array fix didn't solve it — it changed the error message but the underlying issue is still malformed message construction.
+The one thing that hasn't been checked yet: show the actual analyze.js code.
+Tell Claude Code this exactly:
+
+Show me the complete message construction block in analyze.js — specifically the section that builds the messages array for client.messages.create(). Show lines from where content is initialized to where messages is passed to the API call. Do not summarize — show the raw code.
+
+Until we see that block we're guessing. Every fix so far has been applied blind. The 400 with valid transcript + valid photo means either the base64 still has the data:image/jpeg;base64, prefix attached, or the content array structure is wrong in a way the guards aren't catching.
+That's the one piece of information that ends this.
+
+---
+
+The code structure is correct. Claude Code is right — we can't tell from this alone what photoBase64 actually contains when it arrives.
+
+But I can tell you what's most likely wrong: mimeType.
+
+Look at line 74:
+js
+
+media_type: mimeType || 'image/jpeg',
+
+The Anthropic API only accepts these exact strings for media_type:
+
+    image/jpeg
+    image/png
+    image/gif
+    image/webp
+
+If mimeType is arriving as something else — image/jpg, image/jpe, undefined getting coerced wrong, or any other value — Anthropic returns a 400. The || 'image/jpeg' fallback only fires if mimeType is falsy. If it's a non-empty wrong string, the fallback never fires.
+
+Tell Claude Code:
+
+    Don't add a debug log and redeploy. Add this guard instead — force the media_type to a safe value regardless of what mimeType contains:
+    js
+
+    const ALLOWED_MIME = ['image/jpeg','image/png','image/gif','image/webp']
+    const safeMediaType = ALLOWED_MIME.includes(mimeType) ? mimeType : 'image/jpeg'
+
+    Use safeMediaType instead of mimeType || 'image/jpeg' in the image block. Deploy and test.
+
+This fixes the likely cause without a debug-deploy-check-remove cycle. If it still fails after this, then we add the log.
