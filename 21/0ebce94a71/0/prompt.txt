@@ -1,0 +1,47 @@
+Create public/style.css for SiteSpeak AI — mobile-first, dark theme.
+
+CSS variables in :root:
+--color-bg: #111111
+--color-surface: #1e1e1e
+--color-accent: #f5a623
+--color-on-accent: #111111
+--color-error: #e53935
+--color-on-error: #ffffff
+--color-text: #f0f0f0
+--color-muted: #888888
+--color-border: #333333
+--font-main: 'Barlow Condensed', sans-serif
+--radius: 12px
+--map-height: 180px
+
+Global reset: box-sizing border-box, margin 0, padding 0.
+Body: font-family var(--font-main), background var(--color-bg), 
+color var(--color-text), min-height 100vh.
+
+State visibility pattern — show/hide panels using body[data-state]:
+- body[data-state="idle"] shows #voice-mode and #status-bar only
+- body[data-state="recording"] shows #voice-mode and #status-bar, 
+  record-btn gets active/pulsing state
+- body[data-state="confirming"] shows #confirm-panel only
+- body[data-state="processing"] shows #confirm-panel with #confirm-loading visible
+- body[data-state="result"] shows #result-panel only
+- body[data-state="error"] shows #error-panel only
+- All panels hidden by default (display: none), shown only in their state
+
+Key layout requirements:
+- #app: max-width 480px, margin 0 auto, min-height 100vh, display flex, flex-direction column
+- #header: sticky top 0, background var(--color-bg), padding, flex row space-between
+- #record-btn: large tap target minimum 120x120px, circular, background var(--color-accent), 
+  color var(--color-on-accent), centered in main
+- #confirm-panel and #result-panel: scrollable, padding, gap between blocks
+- #confirm-map-img: width 100%, height var(--map-height), object-fit cover, border-radius var(--radius)
+- #confirm-photo-preview: width 100%, max-height 200px, object-fit cover
+- .panel-label: color var(--color-muted), font-size small, display block
+- #submit-btn: full width, background var(--color-accent), color var(--color-on-accent), 
+  large tap target, border-radius var(--radius)
+- #restart-btn and #error-restart-btn: full width, outlined style
+- #usage-counter: font-size small, color var(--color-muted)
+- Recording pulse animation on #record-btn when body[data-state="recording"]
+
+
+Create a markdown file with the code for us to review - do not change anything
