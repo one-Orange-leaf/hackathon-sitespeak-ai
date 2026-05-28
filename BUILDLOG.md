@@ -58,3 +58,34 @@ Vercel's default parser corrupts raw binary audio.
 
 ---
 
+## Step 6 — Analysis Endpoint
+**Time:** 13.15
+**Files:** api/analyze.js
+**Commit:** feat: claude haiku extraction, forced tool use, make.com webhook
+**Why:** Forced tool use (tool_choice: tool) guarantees structured JSON — no 
+prompt-engineering tricks, no JSON.parse on free text. Webhook is awaited and 
+status returned to client. 50-request cap protects demo budget (total cost ~$0.05-0.07).
+
+---
+
+## Step 7 — Motion Helpers
+**Time:** 13:35
+**Files:** public/motion.js
+**Commit:** feat: motion helpers for UI animations
+**Why:** Lightweight animation layer — pulseElement() and fadeIn() add tactile 
+feedback to state transitions without any external dependency. Defensive design: 
+both functions null-check the element before animating so a missing DOM node 
+never throws. Optional layer — app works fully without it.
+
+---
+
+## Step 8 — PWA
+**Time:** 13:45
+**Files:** public/sw.js, public/manifest.json
+**Commit:** feat: service worker and PWA manifest
+**Why:** Service worker enables offline error handling on API routes and 
+installable PWA on Android Chrome. Cache versioned — increment on every 
+deploy to force fresh files to installed clients.
+
+---
+
